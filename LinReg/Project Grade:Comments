@@ -1,0 +1,8 @@
+Implementation (55): you should do classification and evaluate accuracy, which means you should classify each dev and test point using the weights you've learned, and see what's the percentage of accurately predicted points.
+
+Documentation (30)
+
+Code style (10)
+
+
+Total: 95

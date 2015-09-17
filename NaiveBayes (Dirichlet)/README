@@ -1,0 +1,83 @@
+——————————————————————————————
+Programming HW 2: Naive Bayes
+Professor Gildea
+
+Nikita Miroshnichenko
+nmiroshn@u.rochester.edu
+CSC 246
+Student ID: 27554869
+——————————————————————————————
+Homework:
+
+The objective of the homework was to implement Naive Bayesian probability with Dirichlet smoothing for the adult income dataset using Python. The dataset was taken from UCI and converted to a binary file.
+——————————————————————————————
+Files:
+
+bayes.py	-Contains Naive Bayes procedures and call method.
+pic1.jpg	-Screenshot of plot classification error against alpha on Dev set.
+a7a.dev		-Binary dev. dataset.
+a7a.test	-Binary test dataset.
+a7a.train	-Binary train dataset.
+——————————————————————————————
+Algorithm:
+
+The implemented program reads the input file and creates a X matrix and Y vector. Using the training set (a7a.train) the program trains the naive bayesian conditional probabilities of each feature happening being given y = -1 and y = +1. The formula uses a given input alpha which is optimized using the dev set (a7a.dev) later. Using the training set, the ‘train’ method uses the following formula from lecture: 
+P(Xi=Ji|Y=y)=(C(y,Xi)+Alpha(j)) / (C(y)+Sum(Alpha(j)))
+Here, the C() function stands for count. Finally, each conditional probability for each feature is saved into an array for later use by in the Dev set procedure.
+
+After the program has finished training the probabilities, it uses the dev set to pick the optimal alpha value. Using the data from the dev set, the program calls the ‘accuracy’ method and uses the following formula from lecture: Sum((y-yHat)**2). 
+In here, yHat is calculated by using the ‘predict’ method. Predict simply looks through each column of the dev set matrix X (taking each column x_i at a time), then iterates through each feature of the current x_i column. For every feature that is marked with a ‘1’ in the data column the procedure takes that feature conditional probability (calculated before by using the train set) and uses it in the calculation. The procedure takes the conditional probabilities for all features that are recorded with ‘1’s in the data column. 
+
+All of these probabilities, in addition to P(y=-1) and p(y=+1) are used in the following formula from lecture: P(Y,X)=P(Y)*P(x1|Y)*P(x2|Y)*. . .*P(xd|Y).
+Here, ‘d’ is 124 because that is the length of each x_i column. The predict procedure calculates the P(Y,X) for y = -1 and for y = +1, then takes the higher probability for deciding if the current column should have a ‘-1’ or ‘+1’. The accuracy procedure then compares this predicted y value to the actual and gives a MSE accuracy score that we wish to minimize.
+
+Finally, the accuracy_percent method compares the predicted y to the actual but gives out a percentage accuracy score (out of a max of 100% or equivalently 1.00) in decimal form (for instance 0.825… meaning accuracy of 82.5%).
+
+The program is run multiple times on different alphas from 0.02 to 10, and identifies 6.2 to be the optimal alpha value giving an accuracy of approx. 83.7% on the test set data.
+——————————————————————————————
+Instructions: (Run the following command in terminal).
+
+python bayes.py
+——————————————————————————————
+Output: 
+
+The program goes through values for alpha from 0.02 to 10. The procedure tries 50 different alpha values from this range and returns the alpha which minimizes the following accuracy MSE score: Sum((y-yHat)**2). The program picks the best alpha that minimizes this expression. The program identifies that an alpha of 6.2 gives the minimal value of this expression for the dev set. Each loop iteration makes a new conditional probability array for each feature using the current alpha and then tries them out on the dev set. Each loop iteration keeps track of the minimum and compares it to the current score. 
+
+Finally, once the program has found the alpha that minimizes this expression it then graphs the accuracies against alphas and calls the test set (a7a.test) for a prediction. Using the found alpha (by using the dev set) and the probabilities (calculated from the train set) the program calculates the prediction for the test set and outputs the prediction percentage accuracy on the test set. 
+
+As stated in the ‘files’ section of this README, the output plot of classification error against alpha is saved as a pdf in this homework folder.
+
+The following is a shortened output from terminal: 
+(‘. . .’ represent additional entries that were omitted in this write up and save space).
+
+Dev Accuracy:  5905.0 , Percent:  0.81525 , Alpha:  0.2
+Dev Accuracy:  5829.0 , Percent:  0.817625 , Alpha:  0.4
+Dev Accuracy:  5777.0 , Percent:  0.81925 , Alpha:  0.6
+Dev Accuracy:  5733.0 , Percent:  0.820625 , Alpha:  0.8
+Dev Accuracy:  5689.0 , Percent:  0.822 , Alpha:  1.0
+
+.
+.
+.
+Dev Accuracy:  5093.0 , Percent:  0.840625 , Alpha:  5.8
+Dev Accuracy:  5037.0 , Percent:  0.842375 , Alpha:  6.0
+Dev Accuracy:  5025.0 , Percent:  0.84275 , Alpha:  6.2
+Dev Accuracy:  5053.0 , Percent:  0.841875 , Alpha:  6.4
+Dev Accuracy:  5073.0 , Percent:  0.84125 , Alpha:  6.6
+.
+.
+.
+Dev Accuracy:  5225.0 , Percent:  0.8365 , Alpha:  9.6
+Dev Accuracy:  5217.0 , Percent:  0.83675 , Alpha:  9.8
+Dev: For min. MSE score, alpha of:  6.2 , Percent:  0.84275 , Score:  5025.0
+Test Accuracy:  5497.0 , Percent:  0.837371469093 , Alpha:  6.2
+——————————————————————————————
+Interpretation: 
+
+The final result of the program, using alpha of value 6.2 on test, shows that the score value (which is the MSE accuracy measurement) is higher than dev. While this alpha gave approx. 84.3% accuracy for the dev set, it gave approx. 83.7% accuracy for the test set predictions.
+
+The objective of using alpha is to give a smoothing effect on the probability of y = -1 and y = +1 for combination of features (of each x_i column) to get better prediction. Like said in lecture, if all Republicans vote ‘yes’ it’s still possible that one will vote ‘no’ on some later bill. Similarly here, if a certain combination of features gives ‘+1’, it’s still possible that later on a person with such a combination of features could have a ‘-1’. The use of Alpha smoothes out these probabilities to effectively improve accuracy of prediction. We have to derive alpha through some testing to find the optimal increase to accuracy. From my understanding, the point of this assignment was to understand and also try out testing of these alphas and see how prediction accuracies can improve through the use of Dirichlet smoothing. 
+——————————————————————————————
+References: 
+
+I’ve used formulas from class and have discussed this homework with Aly Grealish.

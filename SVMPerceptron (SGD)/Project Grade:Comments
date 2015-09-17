@@ -1,0 +1,28 @@
+Hey dear Nikita:
+
+Your grade for HW4 - perceptron & SVM is as follows, please check the following feedback. In case you have any problem, please feel free to stop by my office during the TA hour.
+
+*********** Feedback *****************
+
+Grade total: 120/140
+Detailed breakdown:
+*Implementation(70/90)
+  **Use stochastic gradient in both methods: run for multiple iterations, one point at a time (preferable with shuffling).(10/10)
+  **Correct update rule for perceptron(20/20)
+  **Correct update rule for SVM (w and b)(10/20)
+  **Correct tuning using development set(20/20)
+  **Descent accuracy for both algorithms(10/20)
+*Documentation(40/40)
+  **Report how performance on dev varies as a function of C, report best accuracy on test(10/10)
+  **Interpretation about perceptron algorithm(10/10)
+  **Interpretation about SVM algorithm(10/10)
+  **Other parts(10/10)
+*Code(10/10)
+  **Readable code(5/5)
+  **Necessary comments(5/5)
+
+
+For perceptron, it's better use learning rate of 1 or constant. For SVM, you should update b with a learning rate. The performance of your perceptron and SVM is not good enough.
+
+Best,
+Xiaochang

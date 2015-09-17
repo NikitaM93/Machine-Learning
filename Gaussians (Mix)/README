@@ -1,0 +1,206 @@
+——————————————————————————————
+Programming HW 7: EM Mixture of Gaussians
+Professor Gildea
+
+Nikita Miroshnichenko
+nmiroshn@u.rochester.edu
+CSC 246
+Student ID: 27554869
+——————————————————————————————
+Homework:
+
+The objective of the homework was to implement EM fitting of a mixture of gaussians on a two-dimensional dataset using Python. 
+
+As a note, please refer to the bottom of this documents for the interpretation of the results and also an explanation of a problem that I have experienced when testing mixtures with very large amounts of gaussians.
+——————————————————————————————
+Files:
+
+mix.py		-Contains EM Gaussian Mixture procedures and call method,	
+		including graphing procedure.
+mixtest.py	-Contains EM Gaussian Mixture procedures and call method, 
+		excluding graphing procedure. 
+train.txt	-Train dataset. Contains 9/10 of the points.dat file.
+		-900 data points.
+dev.txt		-Dev. dataset. Contains the remaining 1/10 of the points.dat file.
+		-100 data points.
+
+Image plots of log likelihood against iteration count:
+train_tied_5.png	-Train PNG. Mixture of 5 Gaussians, ‘tied’ covariance matrix.
+train_tied_7.png	-Train PNG. Mixture of 7 Gaussians, ‘tied’ covariance matrix.
+train_tied_10.png	-Train PNG. Mixture of 10 Gaussians, ‘tied’ covariance matrix.
+
+dev_tied_5.png		-Dev PNG. Mixture of 5 Gaussians, ‘tied’ covariance matrix.
+dev_tied_7.png		-Dev PNG. Mixture of 7 Gaussians, ‘tied’ covariance matrix.
+dev_tied_10.png		-Dev PNG. Mixture of 10 Gaussians, ‘tied’ covariance matrix.
+
+train_separate_5.png	-Train PNG. Mixture of 5 Gaussians, ‘separate’ covariance matrix.
+train_separate_7.png	-Train PNG. Mixture of 7 Gaussians, ‘separate’ covariance matrix.
+train_separate_10.png	-Train PNG. Mixture of 10 Gaussians, ‘separate’ covariance matrix.
+
+dev_separate_5.png	-Dev PNG. Mixture of 5 Gaussians, ‘separate’ covariance matrix.
+dev_separate_7.png	-Dev PNG. Mixture of 7 Gaussians, ‘separate’ covariance matrix.
+dev_separate_10.png	-Dev PNG. Mixture of 10 Gaussians, ‘separate’ covariance matrix.
+	
+
+(The graphing procedure uses the matplotlib python library, which does not work on the cycle machines. The mixtest.py file has been included for testing the program on cycle machines).
+——————————————————————————————
+Algorithm:
+
+The mix.py file contains all of the procedures for the EM mixture of gaussians model. The program firstly reads in the training file (train.txt) and creates a two dimensional X matrix of the two-dimensional points. The resultant X matrix is of dimensions (900,2). The program also takes in 2 command line arguments, the first signifying if the gaussians will have ’tied’ or ‘separate’ covariance matrices and the second signifying the number of gaussians in the mixture.
+
+Once the X matrix is created, the program initializes the gaussian mixture class. Using the command line arguments, the program saves whether the test will involve ‘tied’ or ‘separate’ covariance matrices, the amount of gaussian mixtures to be used, and initializes the probability vector lambda (self.lam) and the mean vector mu (self.mu_rand). 
+
+If the command line argument contains ‘tied’ then the program initializes one tied covariance matrix (which is created by using the mean value of the whole X matrix) and saves it to be the covariance matrix of each gaussian. If the command line argument contains ‘separate’ then the program creates a separate covariance matrix for each gaussian (created by using a random mean value for each gaussian’s covariance calculation). In either case, (whether ‘tied’ or ‘separate’) the program sets the mean of each gaussian to be a random point from the X matrix, ensuring that the mean of each gaussian is different. 
+
+Once this initialization is complete, the program enters an iteration procedure over the E-step and the M-step. The program terminates this procedure when the log likelihood of the result is seen have converged.
+
+	E-Step:
+
+The E-step does the same calculations as explained in class and in the textbook. For each data point within the X matrix, this procedure calculates P(Z=k|X(n)). This value is the probability that a certain point X(n) falls within a certain gaussian k. The calculation of this probability is as follows (taken from section 9.2, page 438 of the class textbook): 
+
+P(Z=k|X(n)) = lambda[k] * N(X(n)|mu(k),sigma(k)) 
+		/ ( from 1 to k sum(lambda[j] * N(X(n)|mu(j),sigma(j)) ) ) 
+
+The N(X(n)|mu(k),sigma(k)) term is calculated as follows (taken from the online notes of section 17.7 page 38 of Professor Gildea’s notes):
+
+N(X(n)|mu(k),sigma(k)) = exp( (-0.5) * (X(n)-mu(k))T * inv.sigma(k) * (X(n)-mu(k)) ) 
+			/ ( ((2*pi)^(D/2)) * (det.sigma(k))^0.5 )
+
+In this formula, sigma(k) is the covariance matrix for each gaussian (which is just one matrix if we are testing gaussians with ‘tied’ covariance matrices). Also, mu(k) is the mean for each gaussian k (each gaussian has a randomly selected mean, which was done in the initialization as mentioned above).
+
+	M-Step:
+
+Once the E-step is done, the program takes the created P(Z=k|X(n)) probabilities and uses them in the M-step. These P(Z=k|X(n)) probabilities are saved in a (k, number of points) matrix, where ‘number of points’ is the amount of data entries in the training set (train.txt).
+
+The M-step follows the calculations from the class notes (taken from the online notes of section 17.7 page 40 of Professor Gildea’s notes). For each gaussian, the procedure calculates a new lambda, mean and covariance matrix. In the case of ‘tied’ covariance matrices, the covariance matrix that is used for all gaussians in the mixture is left as it is and not updated in this step so all of the gaussians remain with the same shape. In the case of ‘separate’ covariance matrices, the individual covariance matrices of the gaussians are updated. 
+
+Lambda of each gaussian (lambda(k)) is updated as follows:
+
+lambda(k) = ( from 1 to N sum(P(Z=k|X(n))) ) / N
+
+Mean (mu) of each gaussian (mu(k)) is updated as follows:
+
+mu(k) = ( from 1 to N sum(P(Z=k|X(n)) * X(n) ) ) 
+	/ ( from 1 to N sum(P(Z=k|X(n)) )
+
+Covariance matrix (sigma) of each gaussian (sigma(k)) is updated as follows:
+
+sigma(k) = ( from 1 to N sum(P(Z=k|X(n)) * (X(n)-mu(k)) * (X(n)-mu(k))T) ) 
+		/ ( from 1 to N sum(P(Z=k|X(n)) )
+
+Here, the value P(Z=k|X(n)) for each point in X matrix is taken from the calculations in the E-step and the value N is the number of data points in the whole X matrix. The value X(n) is the nth data point in the X matrix. Once again, if the calculation is being done for gaussians with ‘tied’ covariance, then there is no covariance matrix update and the covariance matrix remains the same through out the whole EM procedure.
+
+	Log Likelihood:
+
+After each EM step (one E-step followed by one M-step) the procedure calculates the log likelihood and compares it to the previous iteration’s log likelihood. If the resultant values differ by more than 0.05, then the procedure goes onto the next iteration of the EM procedure. The procedure terminates once the current log likelihood value and the value from the previous iteration’s log likelihood are within a difference of 0.05 from each other.
+
+The log likelihood value is calculated as follows(taken from section 9.2, page 439 of the class textbook):
+
+second_sum_term = ( from 1 to k sum(lambda[j] * N(X(n)|mu(j),sigma(j)) ) ) 
+ln(p(X|mu,sigma,lambda) = ( from 1 to N sum(ln( from 1 to k sum(second_sum_term) )) )
+
+	Dev Set Evaluation: 
+
+Once the likelihood has reechoed a convergence (when the current and the previous log likelihoods are within 0.05 of each other) then the program would save the final convergent mu(k)’s, sigma(k)’s and lambda(k)’s for each gaussian. These saved values are then used on the Dev set EM procedure. 
+
+The EM procedure for the Dev set follows the exact same outline as above, but instead of using the train.txt training set file the program uses the dev.txt dev set file. This file is 1/10th of the size of the original points.data file and so only has 100 data points. The procedure beings with initialization, where the dev set’s EM method initializes the procedure’s mu(k), sigma(k) and lambda(k) values to the convergent mu(k), sigma(k) and lambda(k) values. The dev set procedure is then ran until the dev set’s log likelihood is seen to converge (as before, within a difference of 0.05).
+
+For both, the train and the dev set, the procedure graphs the log likelihood against the number of iterations to show the convergence. Since the systems that this assignment will be graded on do not support the matplotlib library, an additional file (that does not graph) has been included. This non-graphing file (mixtest.py) only prints out the log likelihood values and the convergent value as opposed to the original file (mix.py) which prints these values out and graphs them.
+
+——————————————————————————————
+Instructions: (Run the following command in terminal).
+
+For the mix.py file, if you run the program without command line arguments then it will use the default settings (which are: ‘tied’ covariance matrix and mixture of 5 gaussians).
+
+python mix.py
+
+This programs takes in command line arguments if you require specific specifications.
+The first command line argument should be either ‘tied’ or ‘separate’ indicating what kind of covariance matrices you would like to be used. The second command line argument should be an integer value indicating how many gaussians you would like to have in your mixture.
+For instance:
+
+python mix.py tied 10
+(This will run the program on a ‘tied’ covariance matrix, for a mixture of 10 gaussians).
+
+python mix.py separate 5
+(This will run the program on ‘separate’ covariance matrices, for a mixture of 5 gaussians).
+
+I’ve included a mixtest.py file for testing on the cycle systems. These machines do not accept the matplotlib library, which was used in my program to graph the plots. This mixtest.py file is a copy of the mix.py file, but excludes the graphs. This mixtest.py file only prints out the likelihood values and iteration counts.
+——————————————————————————————
+Output: 
+
+The mix.py program outputs the log likelihood values for the queried gaussian mixture number and type of covariance matrix (whether ‘tied’ or ‘separate’). Once the program reaches a convergence on the log likelihood values (where the difference between the current log likelihood and the previous log likelihood value is less than or equal to 0.05) it outputs a plot of the log likelihood value against iteration count.
+
+Given input: python mix.py seperate 5
+The following is a sample terminal output for separate covariance with 5 gaussians:
+
+Running with paramters: seperate covar. matrices, and 5 mixtures.
+Likelihood Values for Train Set:
+new likelihood: -2978.7354104 , old: 0  iteration: 1
+new likelihood: -2915.659186 , old: -2978.7354104  iteration: 2
+new likelihood: -2908.69274944 , old: -2915.659186  iteration: 3
+new likelihood: -2900.53919563 , old: -2908.69274944  iteration: 4
+new likelihood: -2887.95049006 , old: -2900.53919563  iteration: 5
+.
+.
+.
+new likelihood: -2721.5913193 , old: -2721.67118411  iteration: 71
+new likelihood: -2721.5218055 , old: -2721.5913193  iteration: 72
+new likelihood: -2721.46074583 , old: -2721.5218055  iteration: 73
+new likelihood: -2721.40661795 , old: -2721.46074583  iteration: 74
+new likelihood: -2721.3582037 , old: -2721.40661795  iteration: 75
+[[ 1.05693414  1.48957845]
+ [-0.97705856  1.09412832]
+ [-0.98188649 -0.87887048]
+ [ 1.56870421 -0.73641599]
+ [ 1.42095001 -1.36269896]] [ 0.16129038  0.2557649   0.43598656  0.08220172  0.06475645] {0: array([[ 0.34001509,  0.05086622],
+       [ 0.05086622,  0.41896984]]), 1: array([[ 0.464202  ,  0.01221759],
+       [ 0.01221759,  0.37386835]]), 2: array([[ 0.37274188,  0.02360648],
+       [ 0.02360648,  0.48237512]]), 3: array([[ 0.20416717,  0.06957799],
+       [ 0.06957799,  0.29894323]]), 4: array([[ 0.68259403, -0.00970556],
+       [-0.00970556,  0.44567685]])}
+Convergent Train Set Log Likelihood Value:  -2721.3582037
+
+
+Explanation of the Output:
+
+Firstly as a note, the following is a shortened output from terminal: 
+(‘. . .’ represent additional entries that were omitted in this write up and save space).
+
+Once the program has reached a convergent log likelihood value, it prints out the convergent mean, sigma and lambda values. This values from the last iteration will then be used on the dev set’s EM procedure. The output for the dev set’s EM procedure looks just like above. 
+
+Once the program reaches a convergent value for the train set, it graphs a plot of log likelihood against iteration count. Likewise for the dev set. These pdf files are included in this homework folder.
+
+Results:
+Results for different numbers of gaussians with ‘tied’ or ‘separate’ covariance matrices are shown the pdf files within this homework folder.
+——————————————————————————————
+Interpretation: 
+
+From the graphs it is seen that a classification procedure using 10 gaussians with ‘separate’ covariance matrices is seen to converge faster than one using 5 gaussians. This is possibly due to the random means that were chosen for each gaussian. In the beginning of each EM procedure, each gaussian of the mixture receives a random point to serve as it’s mean. The factor of how spread out or congregated these random points are affects the speed of convergence. 
+
+On the other hand, using 10 gaussians with ‘separate’ covariance matrices proved to take twice as long to find a convergence of log likelihood for the dev set than for when using 5 gaussians. Using 5 gaussians the convergence point was reached after 25 iterations, while with using 10 gaussians it was reached after 50 iterations.
+
+While looking at the dev set log likelihood for 7 gaussians with ‘separate’ covariance matrices, it is seen that convergence was reached after 40 iterations. 
+
+These tests show a trend that as the number of gaussians in the mixture rises, the number of iterations taken for log likelihood convergence on the dev set increases.
+
+For the ‘tied’ covariance matrix EM tests, a similar pattern is seen. As it takes 12 iterations for convergence of 5 and 7 gaussians and 14 iterations for convergence of 10 gaussians. Comparing to the EM calculations with ’separate’ covariance matrices, it is seen that there are significantly less iterations with ’tied’ covariance matrices.
+
+The results of this data show that convergence of log likelihood is reached much faster when the mixture’s gaussians have the same covariance matrix, and takes longer when they have different covariance matrices.
+
+——————————————————————————————
+Important Problem:
+
+I have experienced an overflow error when testing on large amounts of gaussians. When testing my procedure on more than 10 gaussians I sometimes experience an overflow error. The error occurs in the log likelihood method, where the np.exp() expression overflows. 
+This error is shown below:
+
+mix.py:207: RuntimeWarning: overflow encountered in exp
+
+Another error referencing a ‘singular matrix’ being the covariance matrix occurs when testing on large amounts of gaussians and happens simultaneously with this exp error. I have not been able to fix these errors when testing on large mixtures.
+
+Nonetheless, the program runs correctly for mixtures of around size 10 gaussians or smaller. 
+
+When testing on large amounts of gaussians, this singular matrix error does not occur all the time, but rather from time to time. This makes it much stranger.
+——————————————————————————————
+References: 
+
+I’ve used formulas from class and have discussed this homework with Aly Grealish.

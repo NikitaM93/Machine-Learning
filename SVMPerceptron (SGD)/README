@@ -1,0 +1,166 @@
+——————————————————————————————
+Programming HW 4: SVM and Perceptron
+Professor Gildea
+
+Nikita Miroshnichenko
+nmiroshn@u.rochester.edu
+CSC 246
+Student ID: 27554869
+——————————————————————————————
+Homework:
+
+The objective of the homework was to implement SVM and Perceptron, using stochastic gradient descent, on the adult income dataset using Python. The dataset was taken from UCI and converted to a binary file.
+——————————————————————————————
+Files:
+
+svm.py		-Contains SVM procedures and call method.
+perceptron.py	-Contains Perceptron procedures and call method.
+a7a.dev		-Binary dev. dataset.
+a7a.test	-Binary test dataset.
+a7a.train	-Binary train dataset.
+sample.test	-Sample test file used to show that the procedures work 
+		with different test files.
+——————————————————————————————
+Algorithm:
+
+For SVM and Perceptron, the implemented programs read the input file and create a X matrix and Y vector. Using the training set (a7a.train) each program trains the weight vector. The SVM program trains the weight vector by following the update rules from lecture. The program uses the following update rules:
+
+if 1-Y(n)*(transpose(W)*X_column(n)+b)>0 then the following updates,
+	W <- W-(eta)*(W-C*Y_hat*X_column(n))
+	b <- b+(C*Y(n)).
+if this condition does not hold then the following updates,
+	W <- W-(eta)*W 
+
+The training procedure is repeated 10 times to better train the vector, resulting in a % increase in final prediction accuracy. As in lecture, the Eta values decreases over time meaning that the updates become smaller and smaller. 
+
+The Perceptron program uses the following update rules for its train procedure:
+
+if Y(k)*X_column(k)<0 then the following updates,
+	gradient_f(w) = gradient_f(w)-(Y(k)*X_column(k)).
+if this condition does not hold then nothing is added to gradient_f(w).
+
+Following this, the weight vector is set to the following:
+self.W-=temp_val*(func_gradient)/(self.numfeats)
+
+The Perceptron’s train procedure repeats for 10 iterations, on each reducing the value of the Eta value (temp_val) over time to give the effect of smaller and smaller updates happening each time.
+
+After these programs have finished training the weight vector, each uses the predict procedure on the Dev set to predict Y_hat. SVM predicts Y_hat by using the following formula from class:
+Y_hat=(transpose(X)*W)+b, and uses the sign function to attribute each Y_hat value to a +1 or -1. From lecture, the sign function works as follows:
+
+sign(Y_Hat)=(0) if Y_Hat=0, sign(Y_Hat)=(-1) if Y_Hat<0, sign(Y_Hat)=(1) if Y_Hat>0.
+
+The Perceptron uses a similar predict procedure to predict Y_hat. It uses the following formula from class to predict Y_hat: Y_hat=(transpose(X)*W), and like SVM uses the sign function to attribute each Y_hat to a +1 or -1.
+
+Following the predict procedure, both SVM and Perceptron call the accuracy and accuracy_percent procedures on the Dev set. the accuracy procedure calculates the MSE score for the predictions, comparing Y_hat to the actual Y values. The following MSE formula from class is used: Sum((y-yHat)**2). The accuracy_percent procedure outputs the percentage of correct predictions, using the following calculation: 
+(number of correct predictions)/(total number of of entries in Y).
+
+The SVM program goes through different Capacity values (C) to find the value which minimizes the MSE score. Like in lecture, the Perceptron program does not use a capacity value.
+
+The output of each program gives the accuracies of the predictions (with the C value used, if looking at SVM), the predicted Y_hat values compared to the actual Y values, and the overall accuracy on the Test set. For SVM, the program is run multiple times to identify the best C value, which for the supplied Test set results in being 800 (when testing on C values from 100 to 1000, incrementing by 100).
+——————————————————————————————
+Instructions: (Run the following command in terminal).
+
+For both SVM and Perceptron, if you run the programs without command line arguments then they will use the default a7a.test file as the Test set. For this use the following instructions:
+
+python svm.py
+
+python perceptron.py 
+
+These programs takes in command line arguments and if you require them to use a different test case then specify the file name of that Test set in the command line:
+
+python svm.py sample.test
+
+python perceptron.py sample.test
+——————————————————————————————
+Output: 
+
+SVM:
+The SVM program goes through C values from 100 to 1000 (incrementing by 100). On each C value iteration, the program prints out the accuracy score and percentage on the Dev set and keep track of the current minimum accuracy MSE score. After it has finished testing for C values from 100 to 1000 it finds the minimum MSE score prediction, gets its respective weight vector and b intercept and runs predict on the Test set using these values. Using the supplied Dev set, the program has found that a C value of 800 gives the best accuracy, resulting in 77.3% on the Dev set and 78.35% on the Test set a7a.test.
+
+The following is a shortened output from terminal: 
+(‘. . .’ represent additional entries that were omitted in this write up and save space).
+
+[ 7560.]  Accuracy score for C value:  100  in set:  a7a.dev
+76.375  % Accuracy.
+[ 7392.]  Accuracy score for C value:  200  in set:  a7a.dev
+76.9  % Accuracy.
+.
+.
+.
+[ 7261.]  Accuracy score for C value:  800  in set:  a7a.dev
+77.3  % Accuracy.
+[ 7404.]  Accuracy score for C value:  900  in set:  a7a.dev
+76.8625  % Accuracy.
+Dev: For min. MSE score, C value of:  800 , Percent :  77.3 %, Score:  [ 7261.]
+------Predictions for Test Entries: 
+[-1.]  predicted. Actual Y value is:  -1.0
+[ 1.]  predicted. Actual Y value is:  -1.0
+[-1.]  predicted. Actual Y value is:  -1.0
+.
+.
+.
+[-1.]  predicted. Actual Y value is:  -1.0
+[-1.]  predicted. Actual Y value is:  -1.0
+[-1.]  predicted. Actual Y value is:  -1.0
+------Test Set Results for File: a7a.test ------
+[ 7328.]  Accuracy score for C value:  800  in set:  a7a.test
+78.3477130363  % Accuracy.
+
+It was noticed that there was a slight % increase in the final Test set prediction after repeating the train procedure 10 times in the SVM program. This increase was about the size of +0.01% accuracy.
+
+Perceptron:
+The Perceptron program also repeats its train procedure 10 times and then outputs the final accuracy on the Dev set and the Test set. The output accuracy for the Dev set is 76.75% and 75.74% on the Test set a7a.test.
+
+The following is a shortened output from terminal: 
+(‘. . .’ represent additional entries that were omitted in this write up and save space).
+
+[ 7440.]  Accuracy score in set:  a7a.dev
+76.75  % Accuracy.
+------Predictions for Test Entries: 
+[-1.]  predicted. Actual Y value is:  -1.0
+[-1.]  predicted. Actual Y value is:  -1.0
+[-1.]  predicted. Actual Y value is:  -1.0
+.
+.
+.
+[-1.]  predicted. Actual Y value is:  -1.0
+[-1.]  predicted. Actual Y value is:  -1.0
+[-1.]  predicted. Actual Y value is:  -1.0
+------Test Set Results for File: a7a.test ------
+[ 8212.]  Accuracy score in set:  a7a.test
+75.7357286373  % Accuracy.
+——————————————————————————————
+Interpretation: 
+
+It’s seen that the performance on SVM increases as a function of C. With C becomes relatively large (value of 800), SVM gave the best accuracy (comparing to C’s of value 100 to 1000). While Perceptron reaches 75.74% accuracy on the a7a.test test set, SVM reaches 78.35% accuracy. Although SVM also decreases the Eta value on each iteration, making the updates to the weight vector (W) smaller and smaller, just like Perceptron does, it was seen that C also had a strong impact on the accuracy. Picking the right C added about 2% to SVM’s final accuracy value.
+
+While the Perceptron has a simpler implementation, it does not lag significantly behind SVM’s performance. The difference in performance is smaller that 5%. Having said this, when comparing the performance of these two programs on smaller test sets, there is a significantly larger difference in % accuracy. When running the two programs with the sample.test test set (which has only 2 entries), it’s seen that SVM performs much better than the Perceptron. As a recap (from the instructions section of this README), you can run with different test cases by entering the desired test case in the command line like this: python svm.py sample.test (and likewise for perceptron). When using this test set (with only 2 entries), SVM gives a 100% accuracy, while the Perceptron gives only 50%.
+
+(‘. . .’ represent additional entries that were omitted in this write up and save space).
+SVM Output for sample.test:
+.
+.
+.
+------Predictions for Test Entries: 
+[ 1.]  predicted. Actual Y value is:  1.0
+[-1.]  predicted. Actual Y value is:  -1.0
+------Test Set Results for File: sample.test ------
+[ 0.]  Accuracy score for C value:  800  in set:  sample.test
+100.0  % Accuracy.
+ 
+Perceptron Output for sample.test: 
+.
+.
+.
+------Predictions for Test Entries: 
+[-1.]  predicted. Actual Y value is:  1.0
+[-1.]  predicted. Actual Y value is:  -1.0
+------Test Set Results for File: sample.test ------
+[ 4.]  Accuracy score in set:  sample.test
+50.0  % Accuracy.
+
+Overall, it seems that SVM had a better accuracy prediction performance than the Perceptron. The tradeoff for this better performance by SVM is the longer runtime comparing to the Perceptron.
+——————————————————————————————
+References: 
+
+I’ve used formulas from class and have discussed this homework with Aly Grealish.

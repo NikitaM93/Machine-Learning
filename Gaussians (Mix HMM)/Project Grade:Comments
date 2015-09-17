@@ -1,0 +1,24 @@
+Hey dear Nikita,
+
+Your grade for HW8 - EM training for an HMM is as follows, please check the following feedback. In case you have any problem, please feel free to stop by my office during the TA hour.
+
+*********** Feedback *****************
+
+Grade total: 95/100
+Detailed breakdown:
+*Implementation(75/80)
+  **Correct forward procedure(20/20)
+  **Correct backward procedure(15/20)
+  **Correct computation of the posteriors(20/20)
+  **Correct update of parameters(20/20)
+*Documentation(20/20)
+  **Comparison with mixture of gaussians(10/10)
+  **Interpretation about mixture of gaussians(10/10)
+
+
+In the backward pass the index is not correct, maybe just not careful enough?
+
+Some common problems: the correct initialization for beta should be \beta [N-1][s] = 1 for each state s. Note N-1 is the last position and there is no dummy symbol here (the dummy version should assign emission probability of 1 to the dummy symbol for each state). The recursive function is \beta[t][s] = \sum_{s'} \beta[t+1][s'] * tr[s'][s] * em[x_{t+1}][s']. The emission is for generating the next observation from the next hidden state s' instead of the currect hidden state s. When you implement HMM, remember most of the terms you deal with are probabilities: alpha, beta, gamma and xi. Gamma, xi need additional normalization. If you use smoothing, add necessary normalization. For underflow issue, the Bishop book provides a technique called "scaling factors". In fact, all the implementation details are described in 13.2 of the Bishop book.
+
+Best,
+Xiaochang

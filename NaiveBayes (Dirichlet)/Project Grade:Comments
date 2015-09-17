@@ -1,0 +1,25 @@
+Hey dear Nikita:
+
+Your grade for HW3 - naive bayes is as follows, please check the following feedback. In case you have any problem, please feel free to stop by my office during the TA hour.
+
+*********** Feedback *****************
+
+Grade total: 90/100
+Detailed breakdown:
+*Implementation(50/60)
+  **Initialize counts(20/20)
+  **Normalization with uniform alpha(10/20)
+  **Evaluation with different alphas(20/20)
+*Documentation(30/30)
+  **Plot classification error on the dev as a function of alpha, report best accuracy on test(10/10)
+  **Interpretation about naive bayes algorithm(10/10)
+  **Other parts(10/10)
+*Code(10/10)
+  **Readable code(5/5)
+  **Necessary comments(5/5)
+
+
+There is one error in your equation. The number of alphas in the denominator should be 2 instead of the number of feature dimensions.
+
+Best,
+Xiaochang

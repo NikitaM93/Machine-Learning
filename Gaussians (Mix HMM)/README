@@ -1,0 +1,194 @@
+——————————————————————————————
+Programming HW 8: EM for HMM Mixture of Gaussians
+Professor Gildea
+
+Nikita Miroshnichenko
+nmiroshn@u.rochester.edu
+CSC 246
+Student ID: 27554869
+——————————————————————————————
+Homework:
+
+The objective of the homework was to implement EM to train HMM on a two-dimensional dataset using Python. The observation probabilities are just like in assignment 7, for a mixture of gaussians. 
+
+As a note, please refer to the bottom of this documents for the interpretation of the results. 
+
+As a further note, when calculating log likelihood after each iteration, I’ve used the formula taken from section 9.2, page 439 of the class textbook. This is the log likelihood formula used for mixture of Gaussians in assignment 7. I assumed that we could use the same log likelihood formula in this assignment. I wanted to note, that this formula also uses a pi variable, which we do not calculate in the HMM. Since we don’t calculate it, I’ve removed it from the original formula. I’ve used this altered log likelihood formula (which excludes the pi variable in its calcualtion) in the log likelihood procedure of the HMM program.
+
+Additionally, the program uses a tied covariance matrix in the initialization. It does not use separate covariance matrices in the initialization.
+——————————————————————————————
+Files:
+
+hmm.py		-Contains EM HMM procedures and call method,	
+		including graphing procedure.
+hmmtest.py	-Contains EM HMM procedures and call method, 
+		excluding graphing procedure. 
+train.txt	-Train dataset. Contains 9/10 of the points.dat file.
+		-900 data points.
+dev.txt		-Dev. dataset. Contains the remaining 1/10 of the points.dat file.
+		-100 data points.
+
+Image plots of log likelihood against state count:
+(‘Iteration Count’ on the x-axis means ‘State Count’).
+train_tied_2.png	-Train PNG. Mixture of 2 Gaussians, ‘tied’ covariance matrix.
+train_tied_5.png	-Train PNG. Mixture of 5 Gaussians, ‘tied’ covariance matrix.
+train_tied_7.png	-Train PNG. Mixture of 7 Gaussians, ‘tied’ covariance matrix.
+train_tied_12.png	-Train PNG. Mixture of 12 Gaussians, ‘tied’ covariance matrix.
+
+dev_tied_2.png		-Dev PNG. Mixture of 2 Gaussians, ‘tied’ covariance matrix.
+dev_tied_5.png		-Dev PNG. Mixture of 5 Gaussians, ‘tied’ covariance matrix.
+dev_tied_7.png		-Dev PNG. Mixture of 7 Gaussians, ‘tied’ covariance matrix.
+dev_tied_12.png		-Dev PNG. Mixture of 12 Gaussians, ‘tied’ covariance matrix.
+
+(The graphing procedure uses the matplotlib python library, which does not work on the cycle machines. The hmmtest.py file has been included for testing the program on cycle machines).
+——————————————————————————————
+Algorithm:
+
+	Initialization:
+
+The hmm.py file contains all of the procedures for the EM HMM model. The program firstly reads in the training file (train.txt) and creates a two dimensional X matrix of the two-dimensional points. The resultant X matrix is of dimensions (900,2). The program also takes in 1 command line arguments, signifying the number of gaussians in the mixture. The program uses a tied covariance matrix for initialization.
+
+Once the X matrix is created, the program initializes the HMM class. Using the command line argument, the program saves the amount of gaussian mixtures to be used, and initializes the mean vector mu (self.mu_rand), the covariance matrix (self.covar_tied_matrix), alpha, beta, gamma, xi, A and B matrices.
+
+The tied covariance matrix is created by using the mean value of the whole X matrix. The program sets the mean of each gaussian k (self.mu_rand(k)) to be a random point from the X matrix, ensuring that the mean of each gaussian is different. 
+
+Once this initialization is complete, the program enters an iteration procedure over the E-step and the M-step. The program terminates this procedure when the log likelihood of the result is seen to have converged.
+
+	E-Step:
+
+The E-step does the same calculations as explained in class and in the textbook. For each state, the procedure calculates the alpha, beta, P(X), xi and gamma values. The calculations are as follows:
+
+Alpha initialization: alpha(0,Start)=1, all other alphas=0. 		
+Calculation: alpha(t,i) += alpha(t-1,j) * A(i,j) * B(t,i).
+
+Beta initialization: alpha(N,i)=1, all other betas=0.
+Calculation: beta(t,i) += beta(t+1,j) * A(j,i) * B(t,j).
+
+P(X) Calculation: P(X) = sum(alpha(Z(n))).
+
+Xi Calculation: (1/P(X)) * alpha(t-1,j) * P(z(t)=i | z(t-1)=j) * P(x=t | z(t)=i) * beta(t,i).
+
+Gamma Calculation: (1/P(X)) * alpha(t,i) * beta(t,i).
+
+In these formulas, alpha and beta initializations are actually done in the Initialization phase (that was explained above). Their initializations have been written here just to show the whole picture. P(X) is the normalization constant mentioned in class. Professor Gildea formally called it ‘Z’ and had (1/Z) in the formulas for xi and gamma. For the purposes of this program, and to avoid confusions, this normalization constant was named ‘P(X)’. The dimensions of alpha, beta, xi and gamma are shown below.
+
+(N indicates the length of the training file, 900 lines. T indicates the number of Z hidden variables, so the number of Gaussians in the mixture).
+
+alpha: N x T matrix. 
+beta: N x T matrix. 
+xi: N x T x T matrix.
+gamma: N x T matrix. 
+
+	M-Step:
+
+Once the E-step is done, the program takes the created alpha, beta, xi and gamma values and uses them in the M-step. 
+
+The M-step follows the calculations from the class notes. It calculates the values of A(i,j) and B(t,i).The calculations are as follows:
+
+ec(i,t) = gamma(t,i)
+ec(i) = sum(gamma(t,i))
+B(t,i) = ec(i,t) / ec(i)
+
+ec(i,j) = sum(xi(t,i,j))
+ec(j) = sum(gamma(t,j))
+A(i,j) = ec(i,j) / ec(j)
+
+Once the A(i,j) and B(t,i) matrices have been calculated in the M-step, the HMM procedure goes to the log likelihood procedure to compare the current calculated log likelihood score to the previous one, in order to check for convergence. 
+ 
+	Log Likelihood:
+
+After each EM step (one E-step followed by one M-step) the procedure calculates the log likelihood and compares it to the previous iteration’s log likelihood. If the resultant values differ by more than 0.000005, then the procedure goes onto the next iteration of the EM procedure. The procedure terminates once the current log likelihood value and the value from the previous iteration’s log likelihood are within a difference of 0.000005 from each other.
+
+The log likelihood value is calculated as follows(taken from section 9.2, page 439 of the class textbook): 
+
+ln(p(X|mu,sigma) = (from 1 to N sum (ln(from 1 to k sum (sum_val_0))) )
+sum_val_0 = (from 1 to k sum (N(X(n)|mu(k),sigma(k))) ) 
+
+The original log likelihood formula in the textbook also includes a pi variable value that is supposed to be calculated. Since we do not have any such variable in our model, I’ve removed it from the used log likelihood formula.
+
+As a note, N = 900 data points and k = number of Gaussians used. The mu(k) and sigma(k) values are calculated within the log likelihood method using the gamma values derived in the EM procedure. The calculations of mu(k) and sigma(k) are as follows:
+
+sigma(k) =  (sum (gamma(t,i) * (x(t)-mu(k))T * (x(t)-mu(k))) / (sum (gamma(t,i)))
+
+mu(k) = (sum (gamma(t,i)) * x(t)) / (sum (gamma(t,i)))
+
+Once the log likelihood for EM on HMM for the training set has converged, the procedure calls the dev set for testing. 
+
+	Dev Set Evaluation: 
+
+Once the likelihood has reechoed a convergence (when the current and the previous log likelihoods are within 0.000005 of each other) then the program saves the final convergent mu(k) and sigma(k) for each gaussian. These saved values are then used on the Dev set EM for HMM procedure. 
+
+The EM procedure for the Dev set follows the exact same outline as above, but instead of using the train.txt training set file the program uses the dev.txt dev set file. This file is 1/10th of the size of the original points.data file and so only has 100 data points. The procedure begins with initialization, where the dev set’s EM for HMM method initializes the procedure’s mu(k)and sigma(k) values to the convergent mu(k) and sigma(k) values. The dev set procedure is then ran until the dev set’s log likelihood is seen to converge (as before, within a difference of 0.000005).
+
+For both, the train and the dev set, the procedure graphs the log likelihood against the number of iterations to show the convergence. This ‘number of iterations’ means the ‘number of states’.
+
+Since the systems that this assignment will be graded on do not support the matplotlib library, an additional file (that does not graph) has been included. This non-graphing file (hmmtest.py) only prints out the log likelihood values and the convergent value as opposed to the original file (hmm.py) which prints these values out and graphs them.
+
+——————————————————————————————
+Instructions: (Run the following command in terminal).
+
+For the hmm.py file, if you run the program without a command line argument, it will use the default settings (which is: mixture of 5 gaussians).
+
+python hmm.py
+
+This programs takes in command line arguments if you require specific specifications.
+The first command line argument should be an integer value indicating how many gaussians you would like to have in your mixture.
+For instance:
+
+python hmm.py 10
+(This will run the program on a tied covariance matrix, for a mixture of 10 gaussians).
+
+I’ve included a hmmtest.py file for testing on the cycle systems. These machines do not accept the matplotlib library, which was used in my program to graph the plots. This hmmtest.py file is a copy of the hmm.py file, but excludes the graphs. This hmmtest.py file only prints out the likelihood values and iteration counts.
+——————————————————————————————
+Output: 
+
+The hmm.py program outputs the log likelihood values for the queried gaussian mixture number. Once the program reaches a convergence on the log likelihood values (where the difference between the current log likelihood and the previous log likelihood value is less than or equal to 0.000005), it outputs a plot of the log likelihood value against iteration count. The ‘iteration count’ is equal to the number of states.
+
+Given input: python hmm.py 5
+The following is a sample terminal output for tied covariance with 5 gaussians:
+
+Running with paramters: tied covar. matrices, and 5 mixtures.
+Likelihood Values for Train Set:
+new likelihood: -23888.5582949 , old: 0  iteration: 1
+new likelihood: -23889.1241198 , old: -23888.5582949  iteration: 2
+new likelihood: -23889.2356209 , old: -23889.1241198  iteration: 3
+new likelihood: -23889.2575968 , old: -23889.2356209  iteration: 4
+new likelihood: -23889.2619289 , old: -23889.2575968  iteration: 5
+new likelihood: -23889.262783 , old: -23889.2619289  iteration: 6
+new likelihood: -23889.2629515 , old: -23889.262783  iteration: 7
+new likelihood: -23889.2629847 , old: -23889.2629515  iteration: 8
+Convergent Train Set Log Likelihood Value:  -23889.2629847
+----------
+Likelihood Values for Dev Set:
+new dev likelihood: -15997.8276645 , old: 0  iteration: 1
+new dev likelihood: -16032.6488001 , old: -15997.8276645  iteration: 2
+new dev likelihood: -16039.2823843 , old: -16032.6488001  iteration: 3
+new dev likelihood: -16040.5712883 , old: -16039.2823843  iteration: 4
+new dev likelihood: -16040.8229469 , old: -16040.5712883  iteration: 5
+new dev likelihood: -16040.8722352 , old: -16040.8229469  iteration: 6
+new dev likelihood: -16040.8819128 , old: -16040.8722352  iteration: 7
+new dev likelihood: -16040.8838171 , old: -16040.8819128  iteration: 8
+new dev likelihood: -16040.8841926 , old: -16040.8838171  iteration: 9
+new dev likelihood: -16040.8842668 , old: -16040.8841926  iteration: 10
+new dev likelihood: -16040.8842814 , old: -16040.8842668  iteration: 11
+Convergent Dev Set Log Likelihood Value:  -16040.8842814
+
+
+Explanation of the Output:
+
+Once the program reaches a convergent value for the train set, it graphs a plot of log likelihood against iteration count (state count). Likewise for the dev set. These png files are included in this homework folder.
+
+Results:
+Results for different numbers of gaussians with tied covariance matrices are shown the png files within this homework folder.
+——————————————————————————————
+Interpretation: 
+
+The png files included in this homework folder show results for running EM for HMM on mixture of 2,5,7 and 12 gaussians with tied covariance matrices. Graphs have been included for the train and dev sets of each mixture.
+
+Please keep in mind that the x-axis titled as ‘Iteration Count’ means ‘State Count’. When looking at the dev set results, it is seen that the state count begins to drop as the number of Gaussians in the mixture grows. A similar pattern is seen with the train sets. The ‘Iteration Count’ (or ‘State Count’), means how many times the EM for HMM procedure was run. Once the log likelihood converged, the results were graphed. For example, the ‘dev_tied_5.png’ file shows convergence after 9 iterations. This means the EM for HMM procedure was run 9 times until convergence was found.
+
+Comparing to the simple EM for Mixture of Gaussians model, completed in assignment 7, it is seen that EM for HMM converges significantly faster. These results show that a sequential model does indeed give a faster convergence to the optimal solution faster than a non-sequential, in the case of the current dataset.
+——————————————————————————————
+References: 
+
+I’ve used formulas from class and have discussed this homework with Aly Grealish and Dan Scarafoni.

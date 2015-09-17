@@ -1,0 +1,25 @@
+Hey dear Nikita,
+
+Your grade for HW7 - EM fitting of a mixture of gaussians or the aspect model is as follows, please check the following feedback. In case you have any problem, please feel free to stop by my office during the TA hour.
+
+*********** Feedback *****************
+
+Grade total: 95/100
+Detailed breakdown:
+*Implementation(65/70)
+  **Correct E-step(20/20)
+  **Correct M-step(20/20)
+  **Correct tied and untied covariance matrices(5/10)
+  **Correct tuning using development set(20/20)
+*Documentation(30/30)
+  **Plot likelihood on train and dev vs iteration(10/10)
+  **The process for choosing K(10/10)
+  **Interpretation about mixture of gaussians(10/10)
+
+
+As for the problems you've encountered, one reason is that you haven't initialized the parameters using some distribution of the observations. Good initialization like kmeans might help. In the tied covariance situation, tied covariance matrice should be used for the mixture of guassian for each data point in the iterative update. And it should also be updated after every iteration, which you haven't taken care of!
+
+Some common problems for mixture of guassians implementation: for initialization, it's better to initialize with the observations like randomly assign each point to a gaussian or use kmeans to initialize. Randomly sample mu and covariance matrice would result in inconsistency with your data and the covariance matrice does not necessarily have a determinant. For the tied covariance matrice version, make sure you use this uniform matrice to calculate the pdf of each data point, and you should also update this matrice iteratively. The correct update rule should be \sum_i (\pi_i * \sigma_i) or 1/N * \sum_n\sum_i (\gamma_{ni} * (x_i-\mu_i)*(x_i-\mu_i)^T)
+
+Best,
+Xiaochang

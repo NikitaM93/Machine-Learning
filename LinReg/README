@@ -1,0 +1,70 @@
+——————————————————————————————
+Programming HW 1: Linear Regression
+Professor Gildea
+
+Nikita Miroshnichenko
+nmiroshn@u.rochester.edu
+CSC 246
+Student ID: 27554869
+——————————————————————————————
+Homework:
+
+The objective of the homework was to implement a linear regression for the adult income dataset using Python. The dataset was taken from UCI and converted to a binary file.
+——————————————————————————————
+Files:
+
+reg.py		-Contains linear regression procedures and call method.
+a7a.dev		-Binary dev. dataset.
+a7a.test	-Binary test dataset.
+a7a.train	-Binary train dataset.
+——————————————————————————————
+Algorithm:
+
+The implemented program reads the input file and creates a X matrix and Y vector. Using the training set (a7a.train) the program trains the weight vector using a given input lambda which is optimized using the dev set (a7a.dev) later. Using the training set, the ‘train’ method uses the following formula from lecture: inverse(X*transpose(X)+lambda*I)*X*y.
+
+After the program has finished training the weight vector, it uses the dev set to pick the optimal lambda value. Using the data from the dev set, the program calls the ‘accuracy’ method and uses the following formula from lecture: min(w)  Sum((y-yHat)**2)+lambda*sqrt(sum(w**2)). In here, yHat is calculated by using the ‘predict’ method and the following equation from lecture: yHat=transpose(X)*weights. Here, ‘X’ is a matrix and ‘weights’ is a vector. 
+
+The program is run multiple times on different lambdas from 0.01 to 1, and identifies 0.8 to be the optimal lambda value.
+——————————————————————————————
+Instructions: (Run the following command in terminal).
+
+python reg.py
+——————————————————————————————
+Output: 
+
+The program builds multiple regressions, going through values for lambda from 0.01 to 1. The procedure tries 100 different lambda values from this range and returns the lambda which minimizes the following accuracy formula from lecture: Sum((y-yHat)**2) + lambda * sqrt(sum(w**2)). Using this formula, the program picks the best lambda that minimizes this expression in relation to ‘w’, the weights. Going from 0.01 to 1 by increments of 0.01, the program identifies that a lambda of 0.8 gives the minimal value of this expression for the dev set. Each loop iteration makes a new regression using the current lambda, makes the weights vector by using the train set and calculates the accuracy score through the formula. Each loop iteration keeps track of the minimum and compares it the current score. 
+
+Finally, once the program has found the lambda that minimizes this expression it then calls the test set (a7a.test). Using the found lambda (by using the dev set) and the weights (calculated from the train set) the program calculates the prediction for the test set and outputs the test set’s yHat. 
+
+The following is a shortened output from terminal: 
+(‘. . .’ represent additional entries that were omitted in this write up and save space).
+
+Lambda:  0.01 Score:  3592.07376934
+Lambda:  0.02 Score:  3592.07139648
+Lambda:  0.03 Score:  3592.06907125
+Lambda:  0.04 Score:  3592.0667925
+Lambda:  0.05 Score:  3592.06455932
+.
+.
+.
+Lambda:  0.79 Score:  3591.99061532
+Lambda:  0.8 Score:  3591.99059976
+Lambda:  0.81 Score:  3591.99060653
+Lambda:  0.82 Score:  3591.99063551
+.
+.
+.
+Lambda:  0.98 Score:  3591.99404081
+Lambda:  0.99 Score:  3591.9944327
+For min. score, lambda of:  0.8 Score:  3591.99059976
+Test Set Lambda:  0.8 Test Set Score:  3783.19834737
+Test Set yHat prediction:  [-1.02263779  0.12428043 -0.405148   ..., -0.79302205 -0.1882782
+ -1.06479996]
+——————————————————————————————
+Interpretation: 
+
+The final result of the program, using lambda of value 0.8, shows that the score value (which is the MSE accuracy measurement, where fit and regularization are accounted for) is even lower than in the dev set. As a recap, this program takes the train set and uses it to make a weight classifier. Once this is done, the program calls the dev set and tests the weight vector using different lambdas to achieve a minimum score in the accuracy expression. Every time the program tries a new lambda the original weights vectors from the train set is recalculated using that value. Once the program has found the lambda (and its respective weights vector) that minimizes the expression then it calls the test set and predicts its yHat.
+——————————————————————————————
+References: 
+
+I’ve used formulas from class, attended the TA python help session and have discussed this homework with Aly Grealish and Edward Barthelemy.
