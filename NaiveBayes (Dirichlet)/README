@@ -7,9 +7,9 @@ nmiroshn@u.rochester.edu
 CSC 246
 Student ID: 27554869
 ——————————————————————————————
-Homework:
+Assignment:
 
-The objective of the homework was to implement Naive Bayesian probability with Dirichlet smoothing for the adult income dataset using Python. The dataset was taken from UCI and converted to a binary file.
+The objective of the assignment was to implement Naive Bayesian probability with Dirichlet smoothing for the adult income dataset using Python. The dataset was taken from UCI and converted to a binary file.
 ——————————————————————————————
 Files:
 
@@ -45,7 +45,7 @@ The program goes through values for alpha from 0.02 to 10. The procedure tries 5
 
 Finally, once the program has found the alpha that minimizes this expression it then graphs the accuracies against alphas and calls the test set (a7a.test) for a prediction. Using the found alpha (by using the dev set) and the probabilities (calculated from the train set) the program calculates the prediction for the test set and outputs the prediction percentage accuracy on the test set. 
 
-As stated in the ‘files’ section of this README, the output plot of classification error against alpha is saved as a pdf in this homework folder.
+As stated in the ‘files’ section of this README, the output plot of classification error against alpha is saved as a pdf in this assignment folder.
 
 The following is a shortened output from terminal: 
 (‘. . .’ represent additional entries that were omitted in this write up and save space).
@@ -80,4 +80,4 @@ The objective of using alpha is to give a smoothing effect on the probability of
 ——————————————————————————————
 References: 
 
-I’ve used formulas from class and have discussed this homework with Aly Grealish.
+I’ve used formulas from class and have discussed this assignment with Aly Grealish.

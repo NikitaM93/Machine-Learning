@@ -7,9 +7,9 @@ nmiroshn@u.rochester.edu
 CSC 246
 Student ID: 27554869
 ——————————————————————————————
-Homework:
+Assignment:
 
-The objective of the homework was to implement SVM and Perceptron, using stochastic gradient descent, on the adult income dataset using Python. The dataset was taken from UCI and converted to a binary file.
+The objective of the assignment was to implement SVM and Perceptron, using stochastic gradient descent, on the adult income dataset using Python. The dataset was taken from UCI and converted to a binary file.
 ——————————————————————————————
 Files:
 
@@ -163,4 +163,4 @@ Overall, it seems that SVM had a better accuracy prediction performance than the
 ——————————————————————————————
 References: 
 
-I’ve used formulas from class and have discussed this homework with Aly Grealish.
+I’ve used formulas from class and have discussed this assignment with Aly Grealish.

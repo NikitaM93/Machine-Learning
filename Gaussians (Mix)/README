@@ -7,9 +7,9 @@ nmiroshn@u.rochester.edu
 CSC 246
 Student ID: 27554869
 ——————————————————————————————
-Homework:
+Assignment:
 
-The objective of the homework was to implement EM fitting of a mixture of gaussians on a two-dimensional dataset using Python. 
+The objective of the assignment was to implement EM fitting of a mixture of gaussians on a two-dimensional dataset using Python. 
 
 As a note, please refer to the bottom of this documents for the interpretation of the results and also an explanation of a problem that I have experienced when testing mixtures with very large amounts of gaussians.
 ——————————————————————————————
@@ -168,10 +168,10 @@ Firstly as a note, the following is a shortened output from terminal:
 
 Once the program has reached a convergent log likelihood value, it prints out the convergent mean, sigma and lambda values. This values from the last iteration will then be used on the dev set’s EM procedure. The output for the dev set’s EM procedure looks just like above. 
 
-Once the program reaches a convergent value for the train set, it graphs a plot of log likelihood against iteration count. Likewise for the dev set. These pdf files are included in this homework folder.
+Once the program reaches a convergent value for the train set, it graphs a plot of log likelihood against iteration count. Likewise for the dev set. These pdf files are included in this assignment folder.
 
 Results:
-Results for different numbers of gaussians with ‘tied’ or ‘separate’ covariance matrices are shown the pdf files within this homework folder.
+Results for different numbers of gaussians with ‘tied’ or ‘separate’ covariance matrices are shown the pdf files within this assignment folder.
 ——————————————————————————————
 Interpretation: 
 
@@ -203,4 +203,4 @@ When testing on large amounts of gaussians, this singular matrix error does not 
 ——————————————————————————————
 References: 
 
-I’ve used formulas from class and have discussed this homework with Aly Grealish.
+I’ve used formulas from class and have discussed this assignment with Aly Grealish.

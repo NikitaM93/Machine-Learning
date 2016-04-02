@@ -7,9 +7,9 @@ nmiroshn@u.rochester.edu
 CSC 246
 Student ID: 27554869
 ——————————————————————————————
-Homework:
+Assignment:
 
-The objective of the homework was to implement a linear regression for the adult income dataset using Python. The dataset was taken from UCI and converted to a binary file.
+The objective of the assignment was to implement a linear regression for the adult income dataset using Python. The dataset was taken from UCI and converted to a binary file.
 ——————————————————————————————
 Files:
 
@@ -67,4 +67,4 @@ The final result of the program, using lambda of value 0.8, shows that the score
 ——————————————————————————————
 References: 
 
-I’ve used formulas from class, attended the TA python help session and have discussed this homework with Aly Grealish and Edward Barthelemy.
+I’ve used formulas from class, attended the TA python help session and have discussed this assignment with Aly Grealish and Edward Barthelemy.
